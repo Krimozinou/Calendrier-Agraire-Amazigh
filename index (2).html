@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendrier Agraire Amazigh</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --terre: #8B4513;
+    --sable: #D2A679;
+    --ocre: #C17D3C;
+    --or: #D4A017;
+    --vert: #5A7A3A;
+    --vert-clair: #8FAF5A;
+    --bleu: #2C5F8A;
+    --rouge: #8B1A1A;
+    --hiver: #2C5F8A;
+    --printemps: #5A7A3A;
+    --ete: #C17D3C;
+    --automne: #8B4513;
+    --bg: #1A0F05;
+    --bg2: #2A1A0A;
+    --texte: #F5E6D0;
+    --texte2: #C8A882;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--texte);
+    font-family: 'Crimson Pro', Georgia, serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Texture de fond */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      radial-gradient(ellipse at 20% 20%, rgba(139,69,19,0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(44,95,138,0.1) 0%, transparent 50%),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* EN-TÊTE */
+  header {
+    text-align: center;
+    margin-bottom: 60px;
+    position: relative;
+  }
+
+  .tifinagh-deco {
+    font-size: 2.5rem;
+    letter-spacing: 12px;
+    color: var(--or);
+    opacity: 0.6;
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    color: var(--sable);
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    line-height: 1.1;
+  }
+
+  header h1 span {
+    display: block;
+    color: var(--or);
+    font-size: 0.55em;
+    letter-spacing: 8px;
+    font-weight: 400;
+    margin-top: 6px;
+  }
+
+  .divider {
+    width: 200px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--or), transparent);
+    margin: 20px auto;
+  }
+
+  .subtitle {
+    font-size: 1.15rem;
+    color: var(--texte2);
+    font-style: italic;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* INTRO */
+  .intro-box {
+    background: linear-gradient(135deg, rgba(139,69,19,0.2), rgba(212,160,23,0.1));
+    border: 1px solid rgba(212,160,23,0.3);
+    border-radius: 4px;
+    padding: 24px 30px;
+    margin-bottom: 50px;
+    text-align: center;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: var(--texte);
+  }
+
+  /* SAISONS */
+  .saisons-legend {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 50px;
+    flex-wrap: wrap;
+  }
+
+  .saison-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .saison-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+  }
+
+  /* ROUE CALENDAIRE */
+  .wheel-section {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  .wheel-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    letter-spacing: 4px;
+    color: var(--or);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .wheel-container {
+    display: inline-block;
+    position: relative;
+  }
+
+  /* GRILLE DES PÉRIODES */
+  .section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    letter-spacing: 4px;
+    color: var(--or);
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .section-title::before,
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(212,160,23,0.4));
+  }
+
+  .section-title::after {
+    background: linear-gradient(270deg, transparent, rgba(212,160,23,0.4));
+  }
+
+  .periods-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 60px;
+  }
+
+  .period-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-left: 3px solid var(--saison-color);
+    border-radius: 4px;
+    padding: 16px 18px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .period-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.02), transparent);
+    pointer-events: none;
+  }
+
+  .period-card:hover {
+    background: rgba(255,255,255,0.06);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  }
+
+  .period-number {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    color: var(--saison-color);
+    opacity: 0.8;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .period-name-amazigh {
+    font-family: 'Cinzel', serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--texte);
+    margin-bottom: 2px;
+  }
+
+  .period-name-fr {
+    font-size: 0.85rem;
+    color: var(--texte2);
+    font-style: italic;
+    margin-bottom: 8px;
+  }
+
+  .period-date {
+    font-size: 0.78rem;
+    color: var(--or);
+    opacity: 0.8;
+    margin-bottom: 6px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+  }
+
+  .period-desc {
+    font-size: 0.88rem;
+    color: var(--texte2);
+    line-height: 1.6;
+  }
+
+  /* Saison automne */
+  .hiver { --saison-color: #4A90D9; }
+  .printemps { --saison-color: #7EC850; }
+  .ete { --saison-color: #E8A030; }
+  .automne { --saison-color: #C26830; }
+  .special { --saison-color: #D4A017; }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 30px;
+    border-top: 1px solid rgba(212,160,23,0.2);
+    color: var(--texte2);
+    font-style: italic;
+    font-size: 0.9rem;
+  }
+
+  /* Roue SVG */
+  svg.calendar-wheel {
+    width: min(600px, 90vw);
+    height: min(600px, 90vw);
+    filter: drop-shadow(0 0 30px rgba(212,160,23,0.15));
+  }
+
+  @media (max-width: 600px) {
+    .saisons-legend { gap: 16px; }
+    .periods-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- EN-TÊTE -->
+  <header>
+    <span class="tifinagh-deco">ⵣ ⴰ ⵎ ⴰ ⵣ ⵉ ⵖ</span>
+    <h1>Calendrier Agraire Amazigh
+      <span>Héritage Ancestral de l'Afrique du Nord</span>
+    </h1>
+    <div class="divider"></div>
+    <p class="subtitle">Un calendrier millénaire encore vivant chez les paysans berbères, rythmé par la nature, les astres et les saisons</p>
+  </header>
+
+  <!-- INTRO -->
+  <div class="intro-box">
+    L'année amazighe est divisée en <strong>44 périodes inégales</strong> allant de 1 à 36 jours, 
+    articulées autour des cycles agricoles de l'olivier, des céréales et de la vigne, 
+    des phénomènes météorologiques et des rituels cosmogoniques transmis de génération en génération.
+  </div>
+
+  <!-- LÉGENDE SAISONS -->
+  <div class="saisons-legend">
+    <div class="saison-badge">
+      <div class="saison-dot" style="background:#4A90D9"></div>
+      <span>Hiver — Tegrest</span>
+    </div>
+    <div class="saison-badge">
+      <div class="saison-dot" style="background:#7EC850"></div>
+      <span>Printemps — Tafsut</span>
+    </div>
+    <div class="saison-badge">
+      <div class="saison-dot" style="background:#E8A030"></div>
+      <span>Été — Anebdu</span>
+    </div>
+    <div class="saison-badge">
+      <div class="saison-dot" style="background:#C26830"></div>
+      <span>Automne — Amwal</span>
+    </div>
+  </div>
+
+  <!-- ROUE CALENDAIRE -->
+  <div class="wheel-section">
+    <div class="wheel-title">✦ La roue de l'année ✦</div>
+    <div class="wheel-container">
+      <svg class="calendar-wheel" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="bg-grad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#2A1A0A"/>
+            <stop offset="100%" stop-color="#0D0805"/>
+          </radialGradient>
+        </defs>
+        <!-- Fond -->
+        <circle cx="250" cy="250" r="248" fill="url(#bg-grad)" stroke="rgba(212,160,23,0.3)" stroke-width="1"/>
+
+        <!-- Arcs des 4 saisons -->
+        <!-- Automne: oct-nov (27/10 au 29/11) -->
+        <path d="M250,250 L250,30 A220,220 0 0,1 440,360 Z" fill="rgba(194,104,48,0.15)" stroke="rgba(194,104,48,0.3)" stroke-width="1"/>
+        <!-- Hiver: déc-fév -->
+        <path d="M250,250 L440,360 A220,220 0 0,1 60,360 Z" fill="rgba(74,144,217,0.12)" stroke="rgba(74,144,217,0.3)" stroke-width="1"/>
+        <!-- Printemps: mars-mai -->
+        <path d="M250,250 L60,360 A220,220 0 0,1 250,30 Z" fill="rgba(126,200,80,0.1)" stroke="rgba(126,200,80,0.3)" stroke-width="1"/>
+
+        <!-- Cercle intérieur décoratif -->
+        <circle cx="250" cy="250" r="100" fill="rgba(26,15,5,0.8)" stroke="rgba(212,160,23,0.4)" stroke-width="1.5"/>
+        <circle cx="250" cy="250" r="80" fill="none" stroke="rgba(212,160,23,0.15)" stroke-width="1" stroke-dasharray="4 4"/>
+
+        <!-- Labels saisons -->
+        <text x="250" y="100" text-anchor="middle" fill="rgba(194,104,48,0.9)" font-family="Cinzel,serif" font-size="11" letter-spacing="2">AUTOMNE</text>
+        <text x="390" y="310" text-anchor="middle" fill="rgba(74,144,217,0.9)" font-family="Cinzel,serif" font-size="11" letter-spacing="2">HIVER</text>
+        <text x="110" y="310" text-anchor="middle" fill="rgba(126,200,80,0.9)" font-family="Cinzel,serif" font-size="11" letter-spacing="2">PRINTEMPS</text>
+        <text x="250" y="430" text-anchor="middle" fill="rgba(232,160,48,0.9)" font-family="Cinzel,serif" font-size="11" letter-spacing="2">ÉTÉ</text>
+
+        <!-- Mois sur le cercle -->
+        <g font-family="Cinzel,serif" font-size="9" fill="rgba(200,168,130,0.7)" text-anchor="middle">
+          <text x="250" y="58" transform="rotate(0,250,250)">JANV</text>
+          <text x="250" y="58" transform="rotate(30,250,250)">FÉVR</text>
+          <text x="250" y="58" transform="rotate(60,250,250)">MARS</text>
+          <text x="250" y="58" transform="rotate(90,250,250)">AVRIL</text>
+          <text x="250" y="58" transform="rotate(120,250,250)">MAI</text>
+          <text x="250" y="58" transform="rotate(150,250,250)">JUIN</text>
+          <text x="250" y="58" transform="rotate(180,250,250)">JUIL</text>
+          <text x="250" y="58" transform="rotate(210,250,250)">AOÛT</text>
+          <text x="250" y="58" transform="rotate(240,250,250)">SEPT</text>
+          <text x="250" y="58" transform="rotate(270,250,250)">OCT</text>
+          <text x="250" y="58" transform="rotate(300,250,250)">NOV</text>
+          <text x="250" y="58" transform="rotate(330,250,250)">DÉC</text>
+        </g>
+
+        <!-- Lignes de division des mois -->
+        <g stroke="rgba(212,160,23,0.15)" stroke-width="1">
+          <line x1="250" y1="30" x2="250" y2="85" transform="rotate(0,250,250)"/>
+          <line x1="250" y1="30" x2="250" y2="85" transform="rotate(30,250,250)"/>
+          <line x1="250" y1="30" x2="250" y2="85" transform="rotate(60,250,250)"/>
+          <line x1="250" y1="30" x2="250" y2="85" transform="rotate(90,250,250)"/>
+          <line x1="250" y1="30" x2="250" y2="85" transform="rotate(120,250,250)"/>
+          <line x1="250" y1="30" x2="250" y2="85" transform="rotate(150,250,250)"/>
+          <line x1="250" y1="30" x2="250" y2="85" transform="rotate(180,250,250)"/>
+          <line x1="250" y1="30" x2="250" y2="85" transform="rotate(210,250,250)"/>
+          <line x1="250" y1="30" x2="250" y2="85" transform="rotate(240,250,250)"/>
+          <line x1="250" y1="30" x2="250" y2="85" transform="rotate(270,250,250)"/>
+          <line x1="250" y1="30" x2="250" y2="85" transform="rotate(300,250,250)"/>
+          <line x1="250" y1="30" x2="250" y2="85" transform="rotate(330,250,250)"/>
+        </g>
+
+        <!-- Centre -->
+        <circle cx="250" cy="250" r="6" fill="#D4A017"/>
+        <circle cx="250" cy="250" r="3" fill="#F5E6D0"/>
+
+        <!-- Texte central -->
+        <text x="250" y="244" text-anchor="middle" fill="#D4A017" font-family="Cinzel,serif" font-size="13" font-weight="600" letter-spacing="1">ⴰⵙⴳⴰⵙ</text>
+        <text x="250" y="262" text-anchor="middle" fill="rgba(200,168,130,0.7)" font-family="Cinzel,serif" font-size="9" letter-spacing="2">L'ANNÉE</text>
+
+        <!-- Points solstices/équinoxes -->
+        <circle cx="250" cy="32" r="4" fill="#E8A030" opacity="0.8"/>
+        <circle cx="468" cy="250" r="4" fill="#4A90D9" opacity="0.8"/>
+        <circle cx="250" cy="468" r="4" fill="#E8A030" opacity="0.8"/>
+        <circle cx="32" cy="250" r="4" fill="#7EC850" opacity="0.8"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- GRILLE DES PÉRIODES -->
+  <div class="section-title">Les 44 Périodes</div>
+  <div class="periods-grid">
+
+    <!-- AUTOMNE -->
+    <div class="period-card automne">
+      <div class="period-number">Période 1 — Automne</div>
+      <div class="period-name-amazigh">Wedjiven</div>
+      <div class="period-name-fr">Les devoirs</div>
+      <div class="period-date">📅 27 Octobre</div>
+      <div class="period-desc">Démarrage de l'année agraire. Premier labour symbolique, rite propitiatoire de fertilité de la terre.</div>
+    </div>
+
+    <div class="period-card automne">
+      <div class="period-number">Période 2 — 25 jours</div>
+      <div class="period-name-amazigh">Lahlel n'Tyerza</div>
+      <div class="period-name-fr">Labours licites</div>
+      <div class="period-date">📅 27 Oct → 21 Nov</div>
+      <div class="period-desc">Labours, semailles et dressage des taureaux. Nettoyage des oliveraies.</div>
+    </div>
+
+    <div class="period-card automne">
+      <div class="period-number">Période 3 — 7 jours</div>
+      <div class="period-name-amazigh">Iqechachen n'Tyerza</div>
+      <div class="period-name-fr">La chute des feuilles</div>
+      <div class="period-date">📅 22 Nov → 29 Nov</div>
+      <div class="period-desc">Dernière semaine des labours, ramassage des olives qui tombent seules (ahlaladh).</div>
+    </div>
+
+    <!-- HIVER -->
+    <div class="period-card hiver">
+      <div class="period-number">Période 4 — Hiver</div>
+      <div class="period-name-amazigh">Taggourt n'Tegrest</div>
+      <div class="period-name-fr">La porte de l'hiver</div>
+      <div class="period-date">📅 29 Novembre</div>
+      <div class="period-desc">Premier jour de l'hiver.</div>
+    </div>
+
+    <div class="period-card hiver">
+      <div class="period-number">Période 5 — 7 jours</div>
+      <div class="period-name-amazigh">Iqechachen n'Tegrest</div>
+      <div class="period-name-fr">Les dernières feuilles</div>
+      <div class="period-date">📅 30 Nov → 6 Déc</div>
+      <div class="period-desc">Entrée de l'hiver. Interdiction d'entrer dans les oliveraies (période improductive).</div>
+    </div>
+
+    <div class="period-card special">
+      <div class="period-number">Période 6 — Fête</div>
+      <div class="period-name-amazigh">Timechret / Zemmour</div>
+      <div class="period-name-fr">La fête des olives</div>
+      <div class="period-date">📅 Date fixée par Tajmaât</div>
+      <div class="period-desc">Fête villageoise avec sacrifice d'animaux, démarrage de la cueillette des olives après Iqechachen.</div>
+    </div>
+
+    <div class="period-card hiver">
+      <div class="period-number">Période 7 — 18 jours</div>
+      <div class="period-name-amazigh">Ussan u Zemmour</div>
+      <div class="period-name-fr">Jours de cueillette</div>
+      <div class="period-date">📅 7 → 24 Décembre</div>
+      <div class="period-desc">Tiwizi, entraide dans la cueillette des olives. Ouverture des huileries.</div>
+    </div>
+
+    <div class="period-card special">
+      <div class="period-number">Période 8 — Rituel</div>
+      <div class="period-name-amazigh">Azounzo</div>
+      <div class="period-name-fr">Ouverture des moulins</div>
+      <div class="period-date">📅 Décembre</div>
+      <div class="period-desc">Goûter rituel de l'huile nouvelle. Ouverture symbolique des moulins à huile.</div>
+    </div>
+
+    <div class="period-card special">
+      <div class="period-number">Période 9 — Solstice</div>
+      <div class="period-name-amazigh">Tughalin n'Tafukt</div>
+      <div class="period-name-fr">Solstice d'hiver</div>
+      <div class="period-date">📅 21 Décembre</div>
+      <div class="period-desc">Solstice d'hiver — le point le plus sombre de l'année, annonciateur du retour de la lumière.</div>
+    </div>
+
+    <div class="period-card hiver">
+      <div class="period-number">Période 10 — 20 jours</div>
+      <div class="period-name-amazigh">Issemaden Iverkanen</div>
+      <div class="period-name-fr">Journées noires et glaciales</div>
+      <div class="period-date">📅 25 Déc → 13 Jan</div>
+      <div class="period-desc">Poursuite de la cueillette des olives. Labours d'hiver.</div>
+    </div>
+
+    <div class="period-card special">
+      <div class="period-number">Période 11 — Fête</div>
+      <div class="period-name-amazigh">Imensi n'Yennayer</div>
+      <div class="period-name-fr">Repas du réveillon</div>
+      <div class="period-date">📅 Veillée du 11 Janvier</div>
+      <div class="period-desc">Fête familiale, rite sacrificiel, rite de passage, réjouissances et exubérance.</div>
+    </div>
+
+    <div class="period-card special">
+      <div class="period-number">Période 12 — Nouvel An</div>
+      <div class="period-name-amazigh">Amenzou n'Yennayer</div>
+      <div class="period-name-fr">Jour de l'An Amazigh</div>
+      <div class="period-date">📅 12 Janvier</div>
+      <div class="period-desc">Ouverture de la nouvelle année amazighe. Travaux domestiques importants, nettoyage et célébrations.</div>
+    </div>
+
+    <div class="period-card hiver">
+      <div class="period-number">Période 13 — 20 jours</div>
+      <div class="period-name-amazigh">Issemaden Imellalen</div>
+      <div class="period-name-fr">Journées blanches et froides</div>
+      <div class="period-date">📅 14 Jan → 2 Fév</div>
+      <div class="period-desc">Poursuite de la récolte des olives dans le froid hivernal.</div>
+    </div>
+
+    <div class="period-card hiver">
+      <div class="period-number">Période 14 — 3 jours</div>
+      <div class="period-name-amazigh">Lâazla</div>
+      <div class="period-name-fr">La quarantaine</div>
+      <div class="period-date">📅 3 → 5 Février</div>
+      <div class="period-desc">Interdiction d'entrer dans les oliveraies. Période de repos et de protection.</div>
+    </div>
+
+    <div class="period-card hiver">
+      <div class="period-number">Période 15 — 7 jours</div>
+      <div class="period-name-amazigh">Mirghan (Mirghou)</div>
+      <div class="period-name-fr">Brûlures du gel</div>
+      <div class="period-date">📅 6 → 12 Février</div>
+      <div class="period-desc">Gelées, précautions pour les récoltes. Feux et fumigations dans les champs pour protéger les cultures.</div>
+    </div>
+
+    <div class="period-card special">
+      <div class="period-number">Période 16 — Mythe</div>
+      <div class="period-name-amazigh">Aretal</div>
+      <div class="period-name-fr">La journée d'emprunt</div>
+      <div class="period-date">📅 13 Février</div>
+      <div class="period-desc">Fourar aurait prêté un jour à Yennayer — jour mythique de la tradition orale amazighe.</div>
+    </div>
+
+    <div class="period-card hiver">
+      <div class="period-number">Période 17 — 7 jours</div>
+      <div class="period-name-amazigh">Mighnan</div>
+      <div class="period-name-fr">Les jours des oiseaux</div>
+      <div class="period-date">📅 14 → 20 Février</div>
+      <div class="period-desc">Période de la taille des oliviers, guidée par le retour des oiseaux.</div>
+    </div>
+
+    <div class="period-card hiver">
+      <div class="period-number">Période 18 — 7 jours</div>
+      <div class="period-name-amazigh">Iâazriyen</div>
+      <div class="period-name-fr">Les journées folles</div>
+      <div class="period-date">📅 21 → 27 Février</div>
+      <div class="period-desc">Dernière semaine de trituration des olives. Fermeture des huileries.</div>
+    </div>
+
+    <!-- PRINTEMPS -->
+    <div class="period-card special">
+      <div class="period-number">Période 19 — Équinoxe</div>
+      <div class="period-name-amazigh">Amenzou n'Tafsut (Aderyis)</div>
+      <div class="period-name-fr">Premier jour de printemps</div>
+      <div class="period-date">📅 28 Février</div>
+      <div class="period-desc">Rituel d'accueil du printemps, procession et repas champêtres. Rituel de fertilité féminine.</div>
+    </div>
+
+    <div class="period-card printemps">
+      <div class="period-number">Période 20 — 10 jours</div>
+      <div class="period-name-amazigh">Tizegaghine</div>
+      <div class="period-name-fr">Les journées rouges</div>
+      <div class="period-date">📅 28 Fév → 9 Mars</div>
+      <div class="period-desc">Nettoyage des oliveraies, taille et élagage. Travail de la laine, tissage des couvertures.</div>
+    </div>
+
+    <div class="period-card printemps">
+      <div class="period-number">Période 21 — 7 jours</div>
+      <div class="period-name-amazigh">Timgharine</div>
+      <div class="period-name-fr">Les vieilles capricieuses</div>
+      <div class="period-date">📅 10 → 16 Mars</div>
+      <div class="period-desc">Travaux dans les oliveraies, épierrage, irrigation. Derniers jours de taille.</div>
+    </div>
+
+    <div class="period-card printemps">
+      <div class="period-number">Période 22 — 7 jours</div>
+      <div class="period-name-amazigh">Ledjwareh</div>
+      <div class="period-name-fr">Les blessures</div>
+      <div class="period-date">📅 17 → 22 Mars</div>
+      <div class="period-desc">Floraison des arbres fruitiers — les bourgeons s'ouvrent comme des blessures de lumière.</div>
+    </div>
+
+    <div class="period-card printemps">
+      <div class="period-number">Période 23 — 7 jours</div>
+      <div class="period-name-amazigh">Swaleh</div>
+      <div class="period-name-fr">La nouaison</div>
+      <div class="period-date">📅 23 → 30 Mars</div>
+      <div class="period-desc">Nouaison des fruits — les fleurs se transforment en petits fruits.</div>
+    </div>
+
+    <div class="period-card printemps">
+      <div class="period-number">Période 24 — 7 jours</div>
+      <div class="period-name-amazigh">Imheznen</div>
+      <div class="period-name-fr">Les jours tristes</div>
+      <div class="period-date">📅 31 Mars → 6 Avril</div>
+      <div class="period-desc">Les 7 jours tristes — période de transition délicate pour les cultures.</div>
+    </div>
+
+    <div class="period-card printemps">
+      <div class="period-number">Période 25 — 7 jours</div>
+      <div class="period-name-amazigh">Aheggan Iharriyen</div>
+      <div class="period-name-fr">Le ciel bouché (froid sec)</div>
+      <div class="period-date">📅 7 → 13 Avril</div>
+      <div class="period-desc">Période de froid sec sous un ciel voilé.</div>
+    </div>
+
+    <div class="period-card printemps">
+      <div class="period-number">Période 26 — 7 jours</div>
+      <div class="period-name-amazigh">Aheggan n'Waklan</div>
+      <div class="period-name-fr">Ciel bouché (radoucissement)</div>
+      <div class="period-date">📅 14 → 20 Avril</div>
+      <div class="period-desc">Radoucissement du climat, greffage des oléastres. Préparatifs du jardin d'été.</div>
+    </div>
+
+    <div class="period-card printemps">
+      <div class="period-number">Période 27 — 7 jours</div>
+      <div class="period-name-amazigh">Tiftirine</div>
+      <div class="period-name-fr">Les cycles</div>
+      <div class="period-date">📅 21 Avril → 2 Mai</div>
+      <div class="period-desc">Rituel de la fécondité, poursuite de la greffe des arbres.</div>
+    </div>
+
+    <div class="period-card printemps">
+      <div class="period-number">Période 28 — 7 jours</div>
+      <div class="period-name-amazigh">Nissan Ighelten</div>
+      <div class="period-name-fr">Les pluies bienfaitrices</div>
+      <div class="period-date">📅 3 → 9 Mai</div>
+      <div class="period-desc">Anzar, rituel d'appel de la pluie en cas de sécheresse. Processions et carnavals.</div>
+    </div>
+
+    <div class="period-card printemps">
+      <div class="period-number">Période 29 — 7 jours</div>
+      <div class="period-name-amazigh">Nissan Oushilen</div>
+      <div class="period-name-fr">Les pluies chaudes</div>
+      <div class="period-date">📅 10 → 16 Mai</div>
+      <div class="period-desc">Récupération des eaux des pluies bienfaitrices pour l'irrigation.</div>
+    </div>
+
+    <div class="period-card printemps">
+      <div class="period-number">Période 30 — 7 jours</div>
+      <div class="period-name-amazigh">Izegzawen</div>
+      <div class="period-name-fr">Les journées vertes</div>
+      <div class="period-date">📅 17 → 23 Mai</div>
+      <div class="period-desc">Formation des épis dans les céréales — la terre est d'un vert intense.</div>
+    </div>
+
+    <div class="period-card printemps">
+      <div class="period-number">Période 31 — 7 jours</div>
+      <div class="period-name-amazigh">Iwraghen</div>
+      <div class="period-name-fr">Les journées jaunes</div>
+      <div class="period-date">📅 24 → 30 Mai</div>
+      <div class="period-desc">Fenaison, labour de printemps. Les champs virent au jaune doré.</div>
+    </div>
+
+    <!-- ÉTÉ -->
+    <div class="period-card special">
+      <div class="period-number">Période 33 — Été</div>
+      <div class="period-name-amazigh">Taggourt u Nevdou</div>
+      <div class="period-name-fr">La porte de l'été</div>
+      <div class="period-date">📅 30 Mai</div>
+      <div class="period-desc">Premier jour d'été — ouverture de la saison chaude.</div>
+    </div>
+
+    <div class="period-card ete">
+      <div class="period-number">Période 34 — 7 jours</div>
+      <div class="period-name-amazigh">Imellalen</div>
+      <div class="period-name-fr">Les journées blanches</div>
+      <div class="period-date">📅 31 Mai → 6 Juin</div>
+      <div class="period-desc">Période des foins — les champs blanchissent sous le soleil.</div>
+    </div>
+
+    <div class="period-card ete">
+      <div class="period-number">Période 35 — 7 jours</div>
+      <div class="period-name-amazigh">Iqurranen</div>
+      <div class="period-name-fr">Les journées sèches</div>
+      <div class="period-date">📅 7 → 13 Juin</div>
+      <div class="period-desc">Formation du fruit dans les oliviers. La chaleur s'installe.</div>
+    </div>
+
+    <div class="period-card ete">
+      <div class="period-number">Période 36 — 23 jours</div>
+      <div class="period-name-amazigh">Tamgra</div>
+      <div class="period-name-fr">Les moissons</div>
+      <div class="period-date">📅 14 Juin → 6 Juillet</div>
+      <div class="period-desc">Moisson de l'orge — période intense de travail collectif.</div>
+    </div>
+
+    <div class="period-card special">
+      <div class="period-number">Période 37 — Solstice</div>
+      <div class="period-name-amazigh">Lâinsla</div>
+      <div class="period-name-fr">Solstice d'été</div>
+      <div class="period-date">📅 7 Juillet</div>
+      <div class="period-desc">Solstice d'été, fête des moissons. Fumigations des oliviers et autres arbres fruitiers.</div>
+    </div>
+
+    <div class="period-card ete">
+      <div class="period-number">Période 38 — 10 jours</div>
+      <div class="period-name-amazigh">Tamouqint</div>
+      <div class="period-name-fr">Le pacte</div>
+      <div class="period-date">📅 7 → 16 Juillet</div>
+      <div class="period-desc">Interdiction de toucher aux figues — pacte sacré avec la nature.</div>
+    </div>
+
+    <div class="period-card special">
+      <div class="period-number">Période 39 — Fête</div>
+      <div class="period-name-amazigh">Afsay n'Tmouqint</div>
+      <div class="period-name-fr">Fin du pacte</div>
+      <div class="period-date">📅 17 Juillet</div>
+      <div class="period-desc">Levée de l'interdiction. Grande fête de la figue.</div>
+    </div>
+
+    <div class="period-card ete">
+      <div class="period-number">Période 40 — Juillet</div>
+      <div class="period-name-amazigh">Assarwet</div>
+      <div class="period-name-fr">Le battage</div>
+      <div class="period-date">📅 Tout le mois de Juillet</div>
+      <div class="period-desc">Battage du blé — travail collectif sous le soleil brûlant.</div>
+    </div>
+
+    <div class="period-card ete">
+      <div class="period-number">Période 41 — 36 jours</div>
+      <div class="period-name-amazigh">Smayem u Nevdu</div>
+      <div class="period-name-fr">Canicule</div>
+      <div class="period-date">📅 25 Juil → 29 Août</div>
+      <div class="period-desc">Période de canicule — la plus longue période du calendrier. La nature se repose sous la chaleur.</div>
+    </div>
+
+    <!-- AUTOMNE -->
+    <div class="period-card special">
+      <div class="period-number">Période 42 — Automne</div>
+      <div class="period-name-amazigh">Amewwan / Lekhrif</div>
+      <div class="period-name-fr">La porte de l'automne</div>
+      <div class="period-date">📅 30 Août</div>
+      <div class="period-desc">Entrée de l'automne.</div>
+    </div>
+
+    <div class="period-card automne">
+      <div class="period-number">Période 43 — 4 jours</div>
+      <div class="period-name-amazigh">Smayem n'Lekhrif</div>
+      <div class="period-name-fr">Les visites</div>
+      <div class="period-date">📅 30 Août → 4 Sept</div>
+      <div class="period-desc">Visites familiales — temps de retrouvailles après les durs travaux estivaux.</div>
+    </div>
+
+    <div class="period-card automne">
+      <div class="period-number">Période 44 — 26 jours</div>
+      <div class="period-name-amazigh">Teyab Erremane</div>
+      <div class="period-name-fr">Le temps des grenades</div>
+      <div class="period-date">📅 5 → 30 Septembre</div>
+      <div class="period-desc">Mûrissement des grenades — couleurs d'automne sur les vergers.</div>
+    </div>
+
+    <div class="period-card automne">
+      <div class="period-number">Période 45 — 26 jours</div>
+      <div class="period-name-amazigh">Azvar</div>
+      <div class="period-name-fr">Le débroussaillement</div>
+      <div class="period-date">📅 1 → 26 Octobre</div>
+      <div class="period-desc">Débroussaillement des oliveraies, préparation de la récolte des olives. Le cycle recommence.</div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="divider"></div>
+    <p style="margin-top:20px;">
+      <em>« Ce calendrier ancestral, encore vivant chez les paysans berbères d'Afrique du Nord, 
+      témoigne d'une connaissance profonde et millénaire des cycles naturels. »</em>
+    </p>
+    <p style="margin-top:10px; font-size:0.8rem; opacity:0.5;">
+      ⴰⵣⵓⵍ — Infographie réalisée par Krimo Météo Algérie 🇩🇿
+    </p>
+  </footer>
+
+</div>
+</body>
+</html>
